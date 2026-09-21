@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CloudGuardian Control Center</title>
+  <link rel="stylesheet" href="/dashboard/styles.css">
+</head>
+<body>
+<header><h1>CloudGuardian</h1><p>AI-Powered CloudOps & Self-Healing Control Center</p></header>
+<main>
+  <section class="grid">
+    <article><span>Service</span><strong id="health">Checking…</strong></article>
+    <article><span>Incidents</span><strong id="count">0</strong></article>
+    <article><span>Mode</span><strong id="mode">Control Plane</strong></article>
+  </section>
+  <section>
+    <h2>Incidents</h2>
+    <button onclick="loadIncidents()">Refresh</button>
+    <pre id="incidents">Loading…</pre>
+  </section>
+</main>
+<script src="/dashboard/app.js"></script>
+</body>
+</html>

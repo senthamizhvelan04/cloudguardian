@@ -1,0 +1,7 @@
+{
+  "type": "HIGH_CPU",
+  "instance": "i-example",
+  "severity": "HIGH",
+  "description": "CPU above 80%",
+  "cpu": 85
+}

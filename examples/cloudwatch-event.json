@@ -1,0 +1,9 @@
+{
+  "detail_type": "CloudWatch Alarm State Change",
+  "alarm_name": "CloudGuardian-HighCPU",
+  "state": "ALARM",
+  "instance_id": "i-example",
+  "metric": "CPUUtilization",
+  "description": "CPU exceeded threshold",
+  "severity": "HIGH"
+}

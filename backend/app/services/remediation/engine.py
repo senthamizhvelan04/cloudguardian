@@ -1,7 +1,8 @@
-from app.models.domain import Incident, Status, AuditEvent
+from app.models.domain import AuditEvent, Incident, Status
 from app.models.store import store
 from app.services.aws.client import AWSService
 from app.services.risk import assess
+
 
 class RemediationEngine:
     def __init__(self, aws: AWSService) -> None:

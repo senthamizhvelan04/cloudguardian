@@ -1,5 +1,7 @@
 from threading import Lock
-from app.models.domain import Incident, Approval, AuditEvent
+
+from app.models.domain import Approval, AuditEvent, Incident
+
 
 class MemoryStore:
     def __init__(self) -> None:

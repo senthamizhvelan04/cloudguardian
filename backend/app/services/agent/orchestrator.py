@@ -1,5 +1,6 @@
 from app.services.risk import assess
 
+
 class ControlledAgent:
     """Bounded agent facade: selects only registered actions; never executes arbitrary commands."""
 

@@ -1,5 +1,6 @@
-from pathlib import Path
 import re
+from pathlib import Path
+
 
 class RunbookRetriever:
     def __init__(self, root: str | None = None) -> None:

@@ -1,6 +1,7 @@
 from app.models.domain import Incident
 from app.services.rag.retriever import RunbookRetriever
 
+
 class DiagnosisService:
     def __init__(self) -> None:
         self.rag = RunbookRetriever()

@@ -1,12 +1,14 @@
 from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, generate_latest
 from starlette.responses import Response
+
+from app.api.v1 import audit, aws, events, health, incidents
 from app.config import get_settings
 from app.logging_config import configure_logging
-from app.api.v1 import health, incidents, aws, events, audit
 
 settings = get_settings()
 configure_logging(settings.log_level)

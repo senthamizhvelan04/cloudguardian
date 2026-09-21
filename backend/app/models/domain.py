@@ -1,7 +1,9 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from uuid import uuid4
+
 from pydantic import BaseModel, Field
+
 
 class IncidentType(str, Enum):
     HIGH_CPU = "HIGH_CPU"
@@ -41,8 +43,8 @@ class Incident(BaseModel):
     diagnosis: str | None = None
     recommendation: str | None = None
     confidence: float | None = Field(default=None, ge=0, le=1)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 class Approval(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid4()))
@@ -50,7 +52,7 @@ class Approval(BaseModel):
     action: str
     approved_by: str | None = None
     approved: bool = False
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 class AuditEvent(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid4()))
@@ -58,4 +60,4 @@ class AuditEvent(BaseModel):
     event: str
     actor: str = "system"
     details: dict = Field(default_factory=dict)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))

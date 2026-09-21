@@ -1,7 +1,9 @@
 from fastapi import APIRouter
-from app.models.domain import Incident, IncidentType, AuditEvent
+
+from app.models.domain import AuditEvent, Incident, IncidentType
 from app.models.store import store
 from app.schemas.api import CloudWatchEvent
+
 router = APIRouter(prefix="/api/v1/events", tags=["events"])
 
 METRIC_MAP = {

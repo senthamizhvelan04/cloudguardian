@@ -1,12 +1,21 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 from fastapi import APIRouter, HTTPException, status
-from app.models.domain import Incident, Status, AuditEvent, Approval
+
+from app.models.domain import Approval, AuditEvent, Incident, Status
 from app.models.store import store
-from app.schemas.api import IncidentCreate, IncidentUpdate, DiagnosisResponse, RemediationRequest, ApprovalRequest, ActionResponse
-from app.services.ai.diagnosis import DiagnosisService
+from app.schemas.api import (
+    ActionResponse,
+    ApprovalRequest,
+    DiagnosisResponse,
+    IncidentCreate,
+    IncidentUpdate,
+    RemediationRequest,
+)
 from app.services.agent.orchestrator import ControlledAgent
-from app.services.remediation.engine import RemediationEngine
+from app.services.ai.diagnosis import DiagnosisService
 from app.services.aws.client import AWSService
+from app.services.remediation.engine import RemediationEngine
 from app.services.risk import assess
 
 router = APIRouter(prefix="/api/v1/incidents", tags=["incidents"])
@@ -43,7 +52,7 @@ def update(incident_id: str, payload: IncidentUpdate):
         raise HTTPException(400, "No fields supplied")
     for key, value in data.items():
         setattr(incident, key, value)
-    incident.updated_at = datetime.now(timezone.utc)
+    incident.updated_at = datetime.now(UTC)
     return incident
 
 @router.post("/{incident_id}/diagnose", response_model=DiagnosisResponse)

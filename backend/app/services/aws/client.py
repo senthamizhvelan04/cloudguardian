@@ -1,7 +1,10 @@
 import logging
+from datetime import UTC
 from typing import Any
+
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
+
 from app.config import get_settings
 
 log = logging.getLogger(__name__)
@@ -39,13 +42,13 @@ class AWSService:
     def cpu(self, instance_id: str, minutes: int = 15) -> float | None:
         if not self.enabled:
             return None
-        from datetime import datetime, timedelta, timezone
+        from datetime import datetime, timedelta
         r = self.cloudwatch.get_metric_statistics(
             Namespace="AWS/EC2",
             MetricName="CPUUtilization",
             Dimensions=[{"Name": "InstanceId", "Value": instance_id}],
-            StartTime=datetime.now(timezone.utc) - timedelta(minutes=minutes),
-            EndTime=datetime.now(timezone.utc),
+            StartTime=datetime.now(UTC) - timedelta(minutes=minutes),
+            EndTime=datetime.now(UTC),
             Period=300,
             Statistics=["Average"],
         )

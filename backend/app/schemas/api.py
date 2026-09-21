@@ -1,6 +1,9 @@
 from datetime import datetime
+
 from pydantic import BaseModel, Field
+
 from app.models.domain import IncidentType, Severity, Status
+
 
 class IncidentCreate(BaseModel):
     type: IncidentType

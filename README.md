@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # CloudGuardian — AI-Powered CloudOps & Self-Healing Platform
 
 CloudGuardian is an engineering-focused CloudOps/SRE platform that detects AWS infrastructure incidents, gathers evidence, diagnoses probable causes with an AI/RAG layer, evaluates remediation risk, requests human approval for sensitive actions, executes only allowlisted SSM actions, verifies recovery, and records an auditable incident trail.
@@ -100,3 +101,6 @@ CloudGuardian never accepts arbitrary shell commands through the API. Remediatio
 The Terraform directory is a reference deployment stack and should be reviewed against your AWS account, region, budget and existing VPC before `terraform apply`. The default application database is SQLite for portability; PostgreSQL can be introduced by setting `DATABASE_URL`.
 
 See `docs/deployment.md` for the deployment sequence and `docs/aws-setup.md` for the manual AWS work.
+=======
+# cloudguardian
+>>>>>>> fce92c5a71939568c2ea8f99ad881d190336a245

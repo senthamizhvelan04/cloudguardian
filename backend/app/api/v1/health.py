@@ -8,7 +8,7 @@ router = APIRouter(tags=["health"])
 
 @router.get("/health", response_model=HealthResponse)
 def health():
-    return HealthResponse(status="ok", service="cloudguardian", version="1.0.0", timestamp=datetime.now(UTC))
+    return {"status": "CloudGuardian CI/CD deployment successful"}
 
 @router.get("/ready")
 def ready():

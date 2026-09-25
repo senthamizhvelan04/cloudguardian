@@ -1,0 +1,14 @@
+services:
+  cloudguardian:
+    build: .
+    container_name: cloudguardian
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - cloudguardian-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  cloudguardian-data:

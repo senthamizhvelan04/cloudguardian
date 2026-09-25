@@ -17,7 +17,7 @@ REQUESTS = Counter("cloudguardian_requests_total", "Total CloudGuardian API requ
 
 app = FastAPI(
     title="CloudGuardian API",
-    version="1.0.0",
+    version="1.0.1",
     description="AI-assisted CloudOps incident detection, diagnosis, controlled remediation and recovery verification.",
 )
 

@@ -18,7 +18,6 @@ from app.services.aws.client import AWSService
 from app.services.remediation.engine import RemediationEngine
 from app.services.risk import assess
 
-
 router = APIRouter(
     prefix="/api/v1/incidents",
     tags=["incidents"],

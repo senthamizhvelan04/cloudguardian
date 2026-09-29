@@ -7,7 +7,6 @@ from app.schemas.api import CloudWatchEvent
 from app.services.agent.orchestrator import ControlledAgent
 from app.services.ai.diagnosis import DiagnosisService
 
-
 router = APIRouter(
     prefix="/api/v1/events",
     tags=["events"],

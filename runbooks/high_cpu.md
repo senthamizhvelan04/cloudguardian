@@ -4,8 +4,8 @@
 
 1. Confirm the alarm and recent CPU datapoints.
 2. Identify CPU-consuming processes.
-3. Inspect service logs.
-4. Use the approved `restart_service` action only for the CloudGuardian test service.
+3. Inspect container logs (Docker) or journal entries (systemd) depending on the deployment model.
+4. Use the approved `restart_service` action only for the CloudGuardian test service. Note that automated SSM remediation targets the Docker container.
 5. Verify service and CPU recovery.
 6. Record evidence and outcome.
 

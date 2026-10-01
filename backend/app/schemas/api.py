@@ -55,7 +55,7 @@ class ApprovalRequest(BaseModel):
         min_length=2,
         max_length=128,
     )
-    approved: bool = True
+    approved: bool
 
 
 class CloudWatchEvent(BaseModel):

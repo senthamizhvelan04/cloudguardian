@@ -4,7 +4,18 @@ from pathlib import Path
 
 class RunbookRetriever:
     def __init__(self, root: str | None = None) -> None:
-        self.root = Path(root or Path(__file__).resolve().parents[4] / "runbooks")
+        if root:
+            self.root = Path(root)
+        else:
+            local_path = Path(__file__).resolve().parents[4] / "runbooks"
+            docker_path = Path("/app/runbooks")
+            
+            if docker_path.exists():
+                self.root = docker_path
+            elif local_path.exists():
+                self.root = local_path
+            else:
+                self.root = local_path
 
     def retrieve(self, query: str, top_k: int = 3) -> list[dict]:
         tokens = set(re.findall(r"[a-z0-9_]+", query.lower()))

@@ -104,25 +104,29 @@ class AWSService:
         instance_id: str,
         action: str,
     ) -> str:
+        s = get_settings()
+        container_name = getattr(s, "container_name", "cloudguardian")
+        port = getattr(s, "health_check_port", 8000)
+
         commands = {
             "restart_service": (
-                "sudo docker restart cloudguardian"
+                f"sudo docker restart {container_name}"
             ),
             "inspect_and_restart_service": (
-                "sudo docker ps "
-                "--filter name=cloudguardian "
-                "--format '{{.Names}}' "
-                "| grep -q cloudguardian "
-                "&& sudo docker restart cloudguardian "
-                "|| sudo docker start cloudguardian"
+                f"sudo docker ps "
+                f"--filter name={container_name} "
+                "--format '{{{{.Names}}}}' "
+                f"| grep -q {container_name} "
+                f"&& sudo docker restart {container_name} "
+                f"|| sudo docker start {container_name}"
             ),
             "collect_logs": (
-                "sudo docker logs --tail 100 cloudguardian"
+                f"sudo docker logs --tail 100 {container_name}"
             ),
             "verify_recovery": (
-                "sudo docker inspect "
-                "-f '{{.State.Running}}' cloudguardian "
-                "&& curl -fsS http://localhost/health"
+                f"sudo docker inspect "
+                f"-f '{{{{.State.Running}}}}' {container_name} "
+                f"&& curl -fsS http://localhost:{port}/health"
             ),
         }
 
@@ -200,6 +204,8 @@ class AWSService:
 
         elapsed = 0
 
+        # NOTE: time.sleep() blocks the thread, but since FastAPI endpoints
+        # run in a threadpool (sync def), this does not block the async event loop.
         while elapsed < max_wait_seconds:
             result = self.get_ssm_command_status(
                 command_id,

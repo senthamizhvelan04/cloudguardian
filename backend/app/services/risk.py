@@ -14,6 +14,7 @@ ACTION_RISK = {
 }
 
 def assess(action: str) -> RiskDecision:
-    if action not in ACTION_RISK:
+    normalized_action = action.lower().strip()
+    if normalized_action not in ACTION_RISK:
         raise ValueError("Action is not allowlisted")
-    return ACTION_RISK[action]
+    return ACTION_RISK[normalized_action]

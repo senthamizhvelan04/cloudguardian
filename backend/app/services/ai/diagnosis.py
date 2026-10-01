@@ -1,5 +1,9 @@
+import logging
+
 from app.models.domain import Incident
 from app.services.rag.retriever import RunbookRetriever
+
+logger = logging.getLogger(__name__)
 
 
 class DiagnosisService:
@@ -11,12 +15,12 @@ class DiagnosisService:
 
         matches = self.rag.retrieve(query, top_k=3)
 
-        print("DIAGNOSIS QUERY:", query)
-        print("DIAGNOSIS MATCHES:", matches)
+        logger.debug("Diagnosis query: %s", query)
+        logger.debug("Diagnosis matches: %s", matches)
 
         evidence = [f"Runbook: {m['source']}" for m in matches]
 
-        print("DIAGNOSIS EVIDENCE:", evidence)
+        logger.debug("Diagnosis evidence: %s", evidence)
 
         if incident.cpu is not None and incident.cpu >= 70:
             diagnosis = (

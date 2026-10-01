@@ -1,7 +1,10 @@
+import logging
 from functools import lru_cache
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+logger = logging.getLogger(__name__)
 
 class Settings(BaseSettings):
     app_name: str = "CloudGuardian"
@@ -29,6 +32,12 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    @model_validator(mode="after")
+    def check_api_key(self):
+        if self.api_key == "change-me" and self.environment != "development":
+            logger.warning("API key is set to 'change-me' in non-development environment!")
+        return self
 
     @property
     def cors_list(self) -> list[str]:

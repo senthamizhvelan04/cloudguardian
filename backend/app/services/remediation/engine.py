@@ -1,7 +1,11 @@
+import logging
+
 from app.models.domain import AuditEvent, Incident, Status
 from app.models.store import store
 from app.services.aws.client import AWSService
 from app.services.risk import assess
+
+logger = logging.getLogger(__name__)
 
 
 class RemediationEngine:
@@ -23,10 +27,20 @@ class RemediationEngine:
 
         incident.status = Status.REMEDIATING
 
-        command_id = self.aws.send_ssm(
-            incident.instance,
-            action,
-        )
+        try:
+            command_id = self.aws.send_ssm(
+                incident.instance,
+                action,
+            )
+        except Exception:
+            logger.exception("Failed to send SSM command")
+            incident.status = Status.FAILED
+            logger.warning("Remediation failed. Manual intervention may be required.")
+            return {
+                "action": action,
+                "status": "failed",
+                "message": "Failed to send SSM command",
+            }
 
         store.add_audit(
             AuditEvent(
@@ -43,13 +57,24 @@ class RemediationEngine:
 
         incident.status = Status.VERIFYING
 
-        command_result = self.aws.wait_for_ssm_command(
-            command_id,
-            incident.instance,
-        )
+        try:
+            command_result = self.aws.wait_for_ssm_command(
+                command_id,
+                incident.instance,
+            )
+        except Exception:
+            logger.exception("Failed to wait for SSM command")
+            incident.status = Status.FAILED
+            logger.warning("Remediation failed. Manual intervention may be required.")
+            return {
+                "action": action,
+                "status": "failed",
+                "message": "Failed to wait for SSM command",
+            }
 
         if command_result["status"] != "Success":
             incident.status = Status.FAILED
+            logger.warning("Remediation failed with status %s. Manual intervention may be required.", command_result["status"])
 
             store.add_audit(
                 AuditEvent(
@@ -75,9 +100,19 @@ class RemediationEngine:
                 "ssm_status": command_result["status"],
             }
 
-        recovery = self.aws.verify_recovery(
-            incident.instance,
-        )
+        try:
+            recovery = self.aws.verify_recovery(
+                incident.instance,
+            )
+        except Exception:
+            logger.exception("Failed to verify recovery")
+            incident.status = Status.FAILED
+            logger.warning("Recovery verification failed. Manual intervention may be required.")
+            return {
+                "action": action,
+                "status": "failed",
+                "message": "Failed to verify recovery",
+            }
 
         if recovery["success"]:
             incident.status = Status.RESOLVED
@@ -106,6 +141,7 @@ class RemediationEngine:
             }
 
         incident.status = Status.FAILED
+        logger.warning("Recovery verification failed. Manual intervention may be required.")
 
         store.add_audit(
             AuditEvent(

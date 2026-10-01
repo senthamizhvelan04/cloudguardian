@@ -1,7 +1,9 @@
+import secrets
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 
+from app.config import get_settings
 from app.models.domain import Approval, AuditEvent, Incident, Status
 from app.models.store import store
 from app.schemas.api import (
@@ -30,15 +32,28 @@ remediation = RemediationEngine(aws)
 agent = ControlledAgent()
 
 
+def verify_api_key(x_api_key: str | None = Header(default=None)):
+    settings = get_settings()
+    if not x_api_key or not secrets.compare_digest(x_api_key, settings.api_key):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing API key",
+        )
+    return x_api_key
+
+
 @router.post(
     "",
     response_model=Incident,
     status_code=status.HTTP_201_CREATED,
 )
-def create(payload: IncidentCreate):
+def create(
+    payload: IncidentCreate,
+    api_key: str = Depends(verify_api_key),
+):
     incident = Incident(**payload.model_dump())
 
-    store.incidents[incident.id] = incident
+    store.add_incident(incident)
 
     store.add_audit(
         AuditEvent(
@@ -58,7 +73,7 @@ def create(payload: IncidentCreate):
     response_model=list[Incident],
 )
 def list_incidents():
-    return list(store.incidents.values())
+    return store.list_incidents()
 
 
 @router.get(
@@ -66,7 +81,7 @@ def list_incidents():
     response_model=Incident,
 )
 def get(incident_id: str):
-    incident = store.incidents.get(incident_id)
+    incident = store.get_incident(incident_id)
 
     if not incident:
         raise HTTPException(
@@ -85,7 +100,7 @@ def update(
     incident_id: str,
     payload: IncidentUpdate,
 ):
-    incident = store.incidents.get(incident_id)
+    incident = store.get_incident(incident_id)
 
     if not incident:
         raise HTTPException(
@@ -111,6 +126,7 @@ def update(
         )
 
     incident.updated_at = datetime.now(UTC)
+    store.update_incident(incident_id, incident)
 
     return incident
 
@@ -119,7 +135,10 @@ def update(
     "/{incident_id}/diagnose",
     response_model=DiagnosisResponse,
 )
-def diagnose_incident(incident_id: str):
+def diagnose_incident(
+    incident_id: str,
+    api_key: str = Depends(verify_api_key),
+):
     incident = get(incident_id)
 
     incident.status = Status.INVESTIGATING
@@ -168,6 +187,7 @@ def diagnose_incident(incident_id: str):
 def approve(
     incident_id: str,
     payload: ApprovalRequest,
+    api_key: str = Depends(verify_api_key),
 ):
     incident = get(incident_id)
 
@@ -194,7 +214,7 @@ def approve(
         approved=payload.approved,
     )
 
-    store.approvals[incident.id] = approval
+    store.add_approval(approval)
 
     if payload.approved:
         incident.status = Status.DIAGNOSED
@@ -227,6 +247,7 @@ def approve(
 def remediate(
     incident_id: str,
     payload: RemediationRequest,
+    api_key: str = Depends(verify_api_key),
 ):
     incident = get(incident_id)
 
@@ -237,7 +258,7 @@ def remediate(
     approver = payload.approved_by
 
     if decision.approval_required:
-        approval = store.approvals.get(
+        approval = store.get_approval(
             incident.id
         )
 
@@ -293,7 +314,10 @@ def remediate(
     "/{incident_id}/verify",
     response_model=Incident,
 )
-def verify(incident_id: str):
+def verify(
+    incident_id: str,
+    api_key: str = Depends(verify_api_key),
+):
     incident = get(incident_id)
 
     if aws.enabled:
